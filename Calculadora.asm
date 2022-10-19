@@ -6,6 +6,7 @@
     msg2 DB 'primeiro numero:$'
     msg3 DB 'segundo numero:$'
     msg4 DB 'resultado:$'
+    msg5 DB 10
 
 
 .code
@@ -35,8 +36,8 @@ call PL
 
 mov ah,01
 int 21h
-mov cl,al
-sub cl,30h
+mov bh,al
+sub bh,30h
 call Pl
 
 
@@ -47,20 +48,25 @@ call PL
 
 mov ah,01
 int 21h
+
 call PL
 
 
 
 
 
-cmp al,01
-jmp SOMA
-cmp al,02
-jmp SUBTRACAO
-cmp al,51h
+
+
+
+
+;cmp al,49H
+;mp SOMA
+;cmp bh,2
+;jmp SUBTRACAO
+cmp bh,3
 jmp MULTIPLICACAO
-cmp al,52h
-jmp DIVISAO
+;cmp al,52h
+;jmp DIVISAO
 
 
 
@@ -70,7 +76,7 @@ jmp DIVISAO
 
 SOMA:
 
-add bl,cl
+add bl,bh
 
 
 
@@ -110,6 +116,28 @@ int 21h
 jmp FIM
 
 MULTIPLICACAO:
+
+mov dl,0h
+add dl,bl
+sub bl,dl
+mov cl,bh
+
+mult2:
+
+add bl,dl
+loop mult2
+
+mov ah,09
+lea dx,msg4
+int 21h
+call PL
+
+
+mov dl,bl
+or dl,30h
+mov ah,02
+int 21h
+
 
 jmp FIM
 
