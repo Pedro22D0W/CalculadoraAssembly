@@ -5,8 +5,8 @@
     msg1 DB 'selecione a operacao:',10,'soma:1',10,'subtracao:2',10,'multiplicacao:3',10,'divisao:4$'
     msg2 DB 'primeiro numero:$'
     msg3 DB 'segundo numero:$'
-    msg4 DB 'resultado:$'
-    msg5 DB 10
+    msg4 DB 10,'resultado:$'
+    msg5 DB "-$"
 
 
 .code
@@ -26,7 +26,7 @@ call PL
 mov ah,01
 int 21h
 mov bl,al
-sub bl,30h
+and bl,0fh
 call PL
 
 mov ah,09
@@ -37,7 +37,7 @@ call PL
 mov ah,01
 int 21h
 mov bh,al
-sub bh,30h
+and bh,0fh
 call Pl
 
 
@@ -49,7 +49,6 @@ call PL
 mov ah,01
 int 21h
 
-call PL
 
 
 
@@ -59,14 +58,15 @@ call PL
 
 
 
-;cmp al,49H
-;mp SOMA
-;cmp bh,2
-;jmp SUBTRACAO
-cmp bh,3
-jmp MULTIPLICACAO
-;cmp al,52h
-;jmp DIVISAO
+
+cmp al,031h
+je SOMA
+cmp al,032h
+jp SUBTRACAO
+cmp al,033h
+je MULTIPLICACAO
+cmp al,034h
+jmp DIVISAO
 
 
 
@@ -75,8 +75,16 @@ jmp MULTIPLICACAO
 
 
 SOMA:
-
+mov cl,10
 add bl,bh
+xor ax,ax
+mov al,bl
+div cl
+
+mov bh,al
+mov bl,ah
+
+
 
 
 
@@ -85,11 +93,21 @@ lea dx,msg4
 int 21h
 call PL
 
+mov dl,bh
+or dl,30h
+mov ah,02
+int 21h
+
+
 
 mov dl,bl
 or dl,30h
 mov ah,02
 int 21h
+
+
+
+
 
 
 
@@ -97,7 +115,10 @@ jmp FIM
 
 SUBTRACAO:
 
-sub bl,cl
+cmp bl,bh
+jl NEGATIVO
+
+sub bl,bh
 
 
 
@@ -106,37 +127,101 @@ lea dx,msg4
 int 21h
 call PL
 
-
 mov dl,bl
-or dl,30h
+add dl,30h
 mov ah,02
 int 21h
+
+
+
 
 
 jmp FIM
 
-MULTIPLICACAO:
+NEGATIVO:
 
-mov dl,0h
-add dl,bl
-sub bl,dl
-mov cl,bh
-
-mult2:
-
-add bl,dl
-loop mult2
+xchg bl,bh
+sub bl,bh
 
 mov ah,09
 lea dx,msg4
 int 21h
 call PL
 
+mov ah,09
+lea dx,msg5
+int 21h
+
+or bl,30h
+mov dl,bl
+mov ah,02
+int 21h
+
+jmp FIM
+
+
+MULTIPLICACAO:
+add dh,0h
+xor ax,ax
+add al,bl
+mov cl,bh
+addsub:
+add dh,al
+
+loop addsub
+mov cl,bl
+
+mult2:
+
+mov dl,10
+shl bh,1
+
+
+
+loop mult2
+sub bh,dh
+sub bh,dh
+sub bh,dh
+sub bh,dh
+
+
+
+
+
+xor ax,ax
+mov al,bh
+div dl
+
+
+
+mov bh,al
+mov bl,ah
+
+
+
+
+
+mov ah,09
+lea dx,msg4
+int 21h
+call PL
+
+mov dl,bh
+or dl,30h
+mov ah,02
+int 21h
+
+
 
 mov dl,bl
 or dl,30h
 mov ah,02
 int 21h
+
+
+
+
+
 
 
 jmp FIM
