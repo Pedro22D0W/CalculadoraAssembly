@@ -1,6 +1,9 @@
 
+TITLE Pedro Rodolfo Silva Galvão Santos (22886287) 
 .model small
 .data
+.stack 100h
+
 
     msg1 DB 'selecione a operacao:',10,'soma:1',10,'subtracao:2',10,'multiplicacao:3',10,'divisao:4$'
     msg2 DB 'primeiro numero:$'
