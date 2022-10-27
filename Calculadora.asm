@@ -161,50 +161,47 @@ jmp FIM
 
 
 MULTIPLICACAO:
-add dh,0h
-xor ax,ax
-add al,bl
-mov cl,bh
-addsub:
-add dh,al
 
-loop addsub
-mov cl,bl
+xor dx,dx
+mov cl,5
 
-mult2:
+mult1:
 
-mov dl,10
+shr bl,1
+jc addd
 shl bh,1
+loop mult1
+mov bh,dh
+jmp resultado
+
+addd:
+add dh,bh
+shl bh,1
+loop mult1
 
 
 
-loop mult2
-sub bh,dh
-sub bh,dh
-sub bh,dh
-sub bh,dh
 
 
 
 
+resultado:
 
+mov cl,10
+add bl,bh
 xor ax,ax
-mov al,bh
-div dl
-
-
+mov al,bl
+div cl
 
 mov bh,al
 mov bl,ah
-
-
-
-
 
 mov ah,09
 lea dx,msg4
 int 21h
 call PL
+
+
 
 mov dl,bh
 or dl,30h
@@ -224,11 +221,53 @@ int 21h
 
 
 
+
+
 jmp FIM
 
 DIVISAO:
 
-jmp FIM
+ XOR CX,CX          ; Limpar o registrador CX, que vai ser usado como auxiliar na contagem desta OP
+        CMP BL,0           ; Se o multiplicador(BL) for 0, jump para "X0"
+        JE M0              ;
+        MAUX1:             ; Segmento auxiliar da multiplicação 1
+            SHR BL,1       ; Desloca o ultimo bit do multiplicador(BL) para direita, jogando em CF
+            JC MAUX2       ; Se CF for 1, jump para AUX1, se ñ segue o codigo
+            SHL BH,1       ; Desloca BH uma casa para direita 
+            JMP MAUX1      ;
+        MAUX2:             ; Segmento auxiliar da multiplicação 2
+            ADD CH,BH      ; Adiciona o Numerador(BH) no produto(CH)
+            SHL BH,1       ;    
+            CMP BL,0       ; Enquanto o Multiplicador(BL) nao for zero, ñ pula para o resultado
+            JNE MAUX1      ;
+            MOV BH, CH     ; Joga o produto em BH, para ser processado pelo RESULT
+            JMP RESULT     ;
+        M0:                ; Multiplicação por 0
+            XOR BH,BH      ; Zera BH
+            JMP RESULT 
+            
+            
+RESULT:                
+      
+    
+        XOR AX,AX          ; Zera o registrador AX para ser utilizado 
+        MOV AL,BH          ; Trás o resultado da operação para AL
+   
+        MOV BL,10          ;
+        DIV BL             ;
+        MOV BX,AX          ; Diviede os numeros e armazena em BH/BL
+
+        MOV DL,BL          ;
+        OR  DL,30h         ; 
+        MOV AH,02h         ;
+        INT 21h            ; Converte para caracter e imprime o primeiro digito
+  
+        MOV DL,BH          ;
+        OR  DL,30h         ;
+        MOV AH,2           ;
+        INT 21h            ; Converte para caracter e imprime o segundo digito
+               ; Vai formatar a "moldura" da calculadora
+        JMP FIM            ; Jump para o fim da calculadora    ;
 
 
 
