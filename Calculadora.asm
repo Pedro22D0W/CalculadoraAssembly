@@ -10,9 +10,13 @@ TITLE Pedro Rodolfo Silva Galvão Santos (22886287)
     msg3 DB 'segundo numero:$'
     msg4 DB 10,'resultado:$'
     msg5 DB "-$"
+    msg6 DB "o divisor nao pode ser maior que o dividendo!$"
+    msg7 DB "o resto da divisao e:$"
 
 
 .code
+
+
 
 main PROC
 
@@ -230,47 +234,140 @@ jmp FIM
 
 DIVISAO:
 
- XOR CX,CX          ; Limpar o registrador CX, que vai ser usado como auxiliar na contagem desta OP
-        CMP BL,0           ; Se o multiplicador(BL) for 0, jump para "X0"
-        JE M0              ;
-        MAUX1:             ; Segmento auxiliar da multiplicação 1
-            SHR BL,1       ; Desloca o ultimo bit do multiplicador(BL) para direita, jogando em CF
-            JC MAUX2       ; Se CF for 1, jump para AUX1, se ñ segue o codigo
-            SHL BH,1       ; Desloca BH uma casa para direita 
-            JMP MAUX1      ;
-        MAUX2:             ; Segmento auxiliar da multiplicação 2
-            ADD CH,BH      ; Adiciona o Numerador(BH) no produto(CH)
-            SHL BH,1       ;    
-            CMP BL,0       ; Enquanto o Multiplicador(BL) nao for zero, ñ pula para o resultado
-            JNE MAUX1      ;
-            MOV BH, CH     ; Joga o produto em BH, para ser processado pelo RESULT
-            JMP RESULT     ;
-        M0:                ; Multiplicação por 0
-            XOR BH,BH      ; Zera BH
-            JMP RESULT 
-            
-            
-RESULT:                
-      
-    
-        XOR AX,AX          ; Zera o registrador AX para ser utilizado 
-        MOV AL,BH          ; Trás o resultado da operação para AL
-   
-        MOV BL,10          ;
-        DIV BL             ;
-        MOV BX,AX          ; Diviede os numeros e armazena em BH/BL
 
-        MOV DL,BL          ;
-        OR  DL,30h         ; 
-        MOV AH,02h         ;
-        INT 21h            ; Converte para caracter e imprime o primeiro digito
-  
-        MOV DL,BH          ;
-        OR  DL,30h         ;
-        MOV AH,2           ;
-        INT 21h            ; Converte para caracter e imprime o segundo digito
-               ; Vai formatar a "moldura" da calculadora
-        JMP FIM            ; Jump para o fim da calculadora    ;
+xor dx,dx
+xor cx,cx
+add dl,bl
+add cl,bh
+
+cmp bl,bh
+jg parouimpar
+
+call PL
+
+mov ah,09
+lea dx,msg6
+int 21h
+call PL
+jmp FIM
+
+parouimpar:
+
+shr bl,1
+jc impar
+jmp par
+
+
+
+par:
+
+;shl dl,1         ;volta o dividendo para o valor normal
+
+
+shl cl,1         ;multiplica o divisor por 2
+;add ch,dl        ;adiciona o divisor em ch
+add dh,2         ;adiciona 2 em numero de vezes que o multiplicador cabe dentro do divisor 
+shr cl,1         ;retorna o divisor para o valor normal 
+
+sub dl,cl        ;subtrai o divisor duas vezes do diviendo
+sub dl,cl
+
+cmp cl,dl
+jge fimdaoperação
+jmp parouimpar
+
+impar:
+
+;shl dl,1         ;volta o dividendo para o valor normal
+
+
+shl cl,1         ;multiplica o divisor por 2
+;add ch,dl        ;adiciona o divisor em ch
+add dh,3         ;adiciona 3 em numero de vezes que o multiplicador cabe dentro do divisor 
+shr cl,1         ;retorna o divisor para o valor normal 
+
+sub dl,cl        ;subtrai o divisor duas vezes do diviendo
+sub dl,cl
+sub dl,cl
+
+cmp cl,dl
+jge fimdaoperação
+jmp parouimpar
+
+
+
+
+
+
+fimdaoperação:
+
+add dl,0
+jz FIM
+add dl,cl
+add ch,1
+mov bl,ch
+mov ch,dl
+jmp resultado2
+
+resultado2:
+
+
+mov cl,10
+add bl,bh
+xor ax,ax
+mov al,bl
+div cl
+
+mov bh,al
+mov bl,ah
+
+mov ah,09
+lea dx,msg4
+int 21h
+call PL
+
+
+
+mov dl,bh
+or dl,30h
+mov ah,02
+int 21h
+
+
+
+mov dl,bl
+or dl,30h
+mov ah,02
+int 21h
+
+call PL
+
+add ch,0
+jz FIM
+
+mov ah,09
+lea dx,msg7
+int 21h
+call PL
+
+
+
+mov dl,ch
+or dl,30h
+mov ah,02
+int 21h
+
+jmp FIM
+
+
+
+
+
+
+
+
+
+
 
 
 
