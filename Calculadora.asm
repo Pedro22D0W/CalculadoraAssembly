@@ -353,12 +353,29 @@ int 21h
 and al,0fh
 add bh,al
 
+add ch,bh
+add cl,bl
+shr ch,1
+shr cl,1
+add ch,ch
+cmp ch,cl
+jg Maior
 
 xor dx,dx
 xor cx,cx
 add dl,bl
 add cl,bh
+jmp parouimpar0
 
+
+maior:
+
+sub bl,bh
+mov dl,bl
+mov dh,1
+jmp resultado2
+
+parouimpar0:
 cmp bl,bh
 jg parouimpar
 
@@ -369,6 +386,7 @@ lea dx,msg6
 int 21h
 call PL
 jmp FIM
+
 
 parouimpar:
 
@@ -467,6 +485,8 @@ jmp resultado2
 
 
 
+
+
 resultado2:
 
 mov ch,dh
@@ -510,9 +530,22 @@ lea dx,msg7
 int 21h
 call PL
 
+mov cl,10
+xor ax,ax
+mov al,bl
+div cl
+
+mov ch,ah
+mov cl,al
 
 
-mov dl,bl
+
+mov dl,cl
+or dl,30h
+mov ah,02
+int 21h
+
+mov dl,ch
 or dl,30h
 mov ah,02
 int 21h
