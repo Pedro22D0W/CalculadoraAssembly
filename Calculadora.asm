@@ -353,6 +353,10 @@ int 21h
 and al,0fh
 add bh,al
 
+cmp bh,bl
+je resultadoigual1
+
+
 add ch,bh
 add cl,bl
 shr ch,1
@@ -366,6 +370,11 @@ xor cx,cx
 add dl,bl
 add cl,bh
 jmp parouimpar0
+
+resultadoigual1:
+mov dh,1
+mov dl,0
+jmp resultado2
 
 
 maior:
