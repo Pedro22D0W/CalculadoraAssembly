@@ -20,6 +20,72 @@ TITLE Pedro Rodolfo Silva Galvão Santos (22886287)
 
 main PROC
 
+
+mov ax,@data 
+mov ds,ax
+
+
+
+
+mov ah,09
+lea dx,msg1
+int 21h
+call PL
+
+mov ah,01
+int 21h
+MOV bl,al
+call Pl
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+cmp bl,031h
+JE SOMA0
+cmp bl,032h
+JE SUBTRACAO0
+cmp bl,033h
+je MULTIPLICACAO0
+cmp bl,034h
+je DIVISAO0
+
+jmp fim
+
+SOMA0:
+call SOMA
+jmp fim
+SUBTRACAO0:
+call SUBTRACAO
+jmp fim
+MULTIPLICACAO0:
+call MULTIPLICACAO
+jmp FIM
+DIVISAO0:
+jmp DIVISAO
+jmp FIM
+
+
+
+
+
+
+
+
+SOMA PROC
+
 mov ax,@data 
 mov ds,ax
 
@@ -47,41 +113,6 @@ mov bh,al
 and bh,0fh
 call Pl
 
-
-mov ah,09
-lea dx,msg1
-int 21h
-call PL
-
-mov ah,01
-int 21h
-
-
-
-
-
-
-
-
-
-
-
-cmp al,031h
-je SOMA
-cmp al,032h
-jp SUBTRACAO
-cmp al,033h
-je MULTIPLICACAO
-cmp al,034h
-jmp DIVISAO
-
-
-
-
-
-
-
-SOMA:
 mov cl,10
 add bl,bh
 xor ax,ax
@@ -90,9 +121,6 @@ div cl
 
 mov bh,al
 mov bl,ah
-
-
-
 
 
 mov ah,09
@@ -111,16 +139,40 @@ mov dl,bl
 or dl,30h
 mov ah,02
 int 21h
+RET
+
+SOMA endp
 
 
 
+SUBTRACAO PROC
+
+mov ax,@data 
+mov ds,ax
+
+mov ah,09
+lea dx,msg2
+int 21h
+call PL
 
 
 
+mov ah,01
+int 21h
+mov bl,al
+and bl,0fh
+call PL
 
-jmp FIM
+mov ah,09
+lea dx,msg3
+int 21h
+call PL
 
-SUBTRACAO:
+mov ah,01
+int 21h
+mov bh,al
+and bh,0fh
+call Pl
 
 cmp bl,bh
 jl NEGATIVO
@@ -143,7 +195,7 @@ int 21h
 
 
 
-jmp FIM
+RET
 
 NEGATIVO:
 
@@ -164,10 +216,39 @@ mov dl,bl
 mov ah,02
 int 21h
 
-jmp FIM
+RET
+
+SUBTRACAO ENDP
 
 
 MULTIPLICACAO:
+
+mov ax,@data 
+mov ds,ax
+
+mov ah,09
+lea dx,msg2
+int 21h
+call PL
+
+
+
+mov ah,01
+int 21h
+mov bl,al
+and bl,0fh
+call PL
+
+mov ah,09
+lea dx,msg3
+int 21h
+call PL
+
+mov ah,01
+int 21h
+mov bh,al
+and bh,0fh
+call Pl
 
 xor dx,dx
 mov cl,5
@@ -230,9 +311,47 @@ int 21h
 
 
 
-jmp FIM
+
+RET
 
 DIVISAO:
+
+mov ax,@data 
+mov ds,ax
+
+mov ah,09
+lea dx,msg2
+int 21h
+call PL
+
+
+
+mov ah,01
+int 21h
+and al,0fh
+mov cl,10
+mul cl
+mov bl,al
+mov ah,01
+int 21h
+and al,0fh
+add bl,al
+call PL
+
+mov ah,09
+lea dx,msg3
+int 21h
+call PL
+mov ah,01
+int 21h
+and al,0fh
+mov cl,10
+mul cl
+mov bh,al
+mov ah,01
+int 21h
+and al,0fh
+add bh,al
 
 
 xor dx,dx
@@ -261,53 +380,60 @@ jmp par
 
 par:
 
-;shl dl,1         ;volta o dividendo para o valor normal
 
 
 shl cl,1         ;multiplica o divisor por 2
 ;add ch,dl        ;adiciona o divisor em ch
 add dh,2         ;adiciona 2 em numero de vezes que o multiplicador cabe dentro do divisor 
-shr cl,1         ;retorna o divisor para o valor normal 
+     
 
 sub dl,cl        ;subtrai o divisor duas vezes do diviendo
-sub dl,cl
+shr cl,1 
+xor bl,bl
+add bl,dl
 
 cmp cl,dl
 je iguais
 cmp dl,0
 je iguala0
 cmp dl,0
-jl menorquezero1
+jl menorque01
+cmp dl,cl
+jl menorquedivisor
 jmp parouimpar
 
 
 
 impar:
 
-;shl dl,1         ;volta o dividendo para o valor normal
+sub bl,1
 
 
 shl cl,1         ;multiplica o divisor por 2
 ;add ch,dl        ;adiciona o divisor em ch
 add dh,3         ;adiciona 3 em numero de vezes que o multiplicador cabe dentro do divisor 
-shr cl,1         ;retorna o divisor para o valor normal 
 
-sub dl,cl        ;subtrai o divisor duas vezes do diviendo
+
+sub dl,cl 
+shr cl,1        ;subtrai o divisor duas vezes do diviendo
 sub dl,cl
-sub dl,cl
+xor bl,bl
+add bl,dl
 
 cmp cl,dl
 je iguais
 cmp dl,0
 je iguala0
 cmp dl,0
-jl menorquezero2
+jl menorque02
+cmp dl,cl
+jl menorquedivisor
 jmp parouimpar
 
 
 iguais:
 sub dl,cl
-add cl,1
+add dh,1
 
 jmp resultado2
 
@@ -315,21 +441,35 @@ iguala0:
 jmp resultado2
 
 
-menorquezero1:
-add dl,cl
-sub ch,1
+menorquedivisor:
 jmp resultado2
 
-menorquezero2:
+
+
+menorque01:
 add dl,cl
 add dl,cl
-sub ch,2
+sub dl,cl
+sub dh,1
+jmp resultado2
+
+
+menorque02:
+add dl,cl
+add dl,cl
+add dl,cl
+sub dl,cl
+sub dl,cl
+sub dh,1
+jmp resultado2
+
+
 
 
 
 resultado2:
 
-mov ch,cl
+mov ch,dh
 
 
 
