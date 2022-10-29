@@ -273,8 +273,14 @@ sub dl,cl        ;subtrai o divisor duas vezes do diviendo
 sub dl,cl
 
 cmp cl,dl
-jge fimdaoperação
+je iguais
+cmp dl,0
+je iguala0
+cmp dl,0
+jl menorquezero1
 jmp parouimpar
+
+
 
 impar:
 
@@ -291,35 +297,51 @@ sub dl,cl
 sub dl,cl
 
 cmp cl,dl
-jge fimdaoperação
+je iguais
+cmp dl,0
+je iguala0
+cmp dl,0
+jl menorquezero2
 jmp parouimpar
 
 
+iguais:
+sub dl,cl
+add cl,1
 
-
-
-
-fimdaoperação:
-
-add dl,0
-jz FIM
-add dl,cl
-add ch,1
-mov bl,ch
-mov ch,dl
 jmp resultado2
+
+iguala0:
+jmp resultado2
+
+
+menorquezero1:
+add dl,cl
+sub ch,1
+jmp resultado2
+
+menorquezero2:
+add dl,cl
+add dl,cl
+sub ch,2
+
+
 
 resultado2:
 
+mov ch,cl
+
+
 
 mov cl,10
-add bl,bh
 xor ax,ax
-mov al,bl
+mov al,ch
 div cl
 
-mov bh,al
-mov bl,ah
+mov ch,ah
+mov cl,al
+
+mov bl,dl
 
 mov ah,09
 lea dx,msg4
@@ -328,22 +350,20 @@ call PL
 
 
 
-mov dl,bh
+mov dl,cl
 or dl,30h
 mov ah,02
 int 21h
 
 
 
-mov dl,bl
+mov dl,ch
 or dl,30h
 mov ah,02
 int 21h
 
 call PL
 
-add ch,0
-jz FIM
 
 mov ah,09
 lea dx,msg7
@@ -352,7 +372,7 @@ call PL
 
 
 
-mov dl,ch
+mov dl,bl
 or dl,30h
 mov ah,02
 int 21h
