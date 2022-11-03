@@ -74,7 +74,7 @@ MULTIPLICACAO0:
 call MULTIPLICACAO
 jmp FIM
 DIVISAO0:
-jmp DIVISAO
+jmp DIVISAO2
 jmp FIM
 
 
@@ -560,6 +560,64 @@ mov ah,02
 int 21h
 
 jmp FIM
+
+DIVISAO2:
+
+mov ah,09
+lea dx,msg2
+int 21h
+call PL
+
+
+
+mov ah,01
+int 21h
+and al,0fh
+
+mov bh,al
+
+call PL
+
+mov ah,09
+lea dx,msg3
+int 21h
+call PL
+
+
+mov ah,01
+int 21h
+and al,0fh
+mov dh,al
+
+xor ax,ax
+;xor bh,bh
+mov al,bh
+xor dl,dl
+xor bx,bx
+
+
+
+mov cx,9
+
+divv:
+sub ax,dx
+jns subb1
+add ax,dx
+mov bh,0
+jmp subb2
+
+subb1:
+mov bh,1
+
+subb2:
+shl bl,1
+or bl,bh
+shr dx,1
+loop divv
+
+
+
+
 
 
 
