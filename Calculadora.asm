@@ -12,6 +12,7 @@ TITLE Pedro Rodolfo Silva Galvão Santos (22886287)
     msg5 DB "-$"
     msg6 DB "o divisor nao pode ser maior que o dividendo!$"
     msg7 DB "o resto da divisao e:$"
+    msg8 DB "inderteminacao matematica!$"
 
 
 .code
@@ -34,60 +35,8 @@ call PL
 
 mov ah,01
 int 21h
-MOV bl,al
+MOV ch,al
 call Pl
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-cmp bl,031h
-JE SOMA0
-cmp bl,032h
-JE SUBTRACAO0
-cmp bl,033h
-je MULTIPLICACAO0
-cmp bl,034h
-je DIVISAO0
-
-jmp fim
-
-SOMA0:
-call SOMA
-jmp fim
-SUBTRACAO0:
-call SUBTRACAO
-jmp fim
-MULTIPLICACAO0:
-call MULTIPLICACAO
-jmp FIM
-DIVISAO0:
-jmp DIVISAO2
-jmp FIM
-
-
-
-
-
-
-
-
-SOMA PROC
-
-mov ax,@data 
-mov ds,ax
 
 mov ah,09
 lea dx,msg2
@@ -113,15 +62,41 @@ mov bh,al
 and bh,0fh
 call Pl
 
+
+cmp ch,031h
+JE SOMA0
+cmp ch,032h
+JE SUBTRACAO0
+cmp ch,033h
+je MULTIPLICACAO0
+cmp ch,034h
+je DIVISAO0
+
+jmp fim
+
+SOMA0:
+call SOMA
+jmp resultado
+SUBTRACAO0:
+call SUBTRACAO
+jmp resultado
+MULTIPLICACAO0:
+call MULTIPLICACAO
+jmp resultado
+DIVISAO0:
+jmp DIVISAO
+jmp resultado
+
+resultado:
+
+xor cx,cx
 mov cl,10
-add bl,bh
 xor ax,ax
 mov al,bl
 div cl
 
 mov bh,al
 mov bl,ah
-
 
 mov ah,09
 lea dx,msg4
@@ -134,11 +109,80 @@ mov ah,02
 int 21h
 
 
+mov dl,bl
+or dl,30h
+mov ah,02
+int 21h
+
+jmp FIM
+
+divv_resultado:
+
+mov cl,10
+xor ax,ax
+mov al,bl
+div cl
+
+mov bh,ah
+mov bl,al
+
+
+mov ah,09
+lea dx,msg4
+int 21h
+call PL
+
+
 
 mov dl,bl
 or dl,30h
 mov ah,02
 int 21h
+
+
+
+mov dl,bh
+or dl,30h
+mov ah,02
+int 21h
+
+call PL
+
+
+mov ah,09
+lea dx,msg7
+int 21h
+call PL
+
+mov cl,10
+xor ax,ax
+mov al,ch
+div cl
+
+mov bh,ah
+mov bl,al
+
+
+
+mov dl,bl
+or dl,30h
+mov ah,02
+int 21h
+
+mov dl,bh
+or dl,30h
+mov ah,02
+int 21h
+
+jmp FIM
+
+
+
+
+
+SOMA PROC
+
+add bl,bh
 RET
 
 SOMA endp
@@ -150,51 +194,12 @@ SUBTRACAO PROC
 mov ax,@data 
 mov ds,ax
 
-mov ah,09
-lea dx,msg2
-int 21h
-call PL
 
-
-
-mov ah,01
-int 21h
-mov bl,al
-and bl,0fh
-call PL
-
-mov ah,09
-lea dx,msg3
-int 21h
-call PL
-
-mov ah,01
-int 21h
-mov bh,al
-and bh,0fh
-call Pl
 
 cmp bl,bh
 jl NEGATIVO
 
 sub bl,bh
-
-
-
-mov ah,09
-lea dx,msg4
-int 21h
-call PL
-
-mov dl,bl
-add dl,30h
-mov ah,02
-int 21h
-
-
-
-
-
 RET
 
 NEGATIVO:
@@ -215,42 +220,14 @@ or bl,30h
 mov dl,bl
 mov ah,02
 int 21h
-
-RET
+jmp FIM
 
 SUBTRACAO ENDP
 
 
-MULTIPLICACAO:
-
-mov ax,@data 
-mov ds,ax
-
-mov ah,09
-lea dx,msg2
-int 21h
-call PL
-
-
-
-mov ah,01
-int 21h
-mov bl,al
-and bl,0fh
-call PL
-
-mov ah,09
-lea dx,msg3
-int 21h
-call PL
-
-mov ah,01
-int 21h
-mov bh,al
-and bh,0fh
-call Pl
-
+MULTIPLICACAO PROC
 xor dx,dx
+xor cx,cx
 mov cl,5
 
 mult1:
@@ -259,339 +236,32 @@ shr bl,1
 jc addd
 shl bh,1
 loop mult1
-mov bh,dh
-jmp resultado
+mov bl,dh
+RET
 
 addd:
 add dh,bh
 shl bh,1
 loop mult1
-
-
-
-
-
-
-
-resultado:
-
-mov cl,10
-add bl,bh
-xor ax,ax
-mov al,bl
-div cl
-
-mov bh,al
-mov bl,ah
-
-mov ah,09
-lea dx,msg4
-int 21h
-call PL
-
-
-
-mov dl,bh
-or dl,30h
-mov ah,02
-int 21h
-
-
-
-mov dl,bl
-or dl,30h
-mov ah,02
-int 21h
-
-
-
-
-
-
-
-
-
-
+mov bl,dh
 RET
+MULTIPLICACAO ENDP
+
 
 DIVISAO:
 
-mov ax,@data 
-mov ds,ax
-
-mov ah,09
-lea dx,msg2
-int 21h
-call PL
-
-
-
-mov ah,01
-int 21h
-and al,0fh
-mov cl,10
-mul cl
-mov bl,al
-mov ah,01
-int 21h
-and al,0fh
-add bl,al
-call PL
-
-mov ah,09
-lea dx,msg3
-int 21h
-call PL
-mov ah,01
-int 21h
-and al,0fh
-mov cl,10
-mul cl
-mov bh,al
-mov ah,01
-int 21h
-and al,0fh
-add bh,al
-
 cmp bh,bl
-je resultadoigual1
+jg divv_maior_que_dividendo
+cmp bh,0
+je inderteminacao
 
 
-add ch,bh
-add cl,bl
-shr ch,1
-shr cl,1
-add ch,ch
-cmp ch,cl
-jg Maior
 
-xor dx,dx
-xor cx,cx
-add dl,bl
-add cl,bh
-jmp parouimpar0
 
-resultadoigual1:
-mov dh,1
-mov dl,0
-jmp resultado2
+mov dh,bh
 
-
-maior:
-
-sub bl,bh
-mov dl,bl
-mov dh,1
-jmp resultado2
-
-parouimpar0:
-cmp bl,bh
-jg parouimpar
-
-call PL
-
-mov ah,09
-lea dx,msg6
-int 21h
-call PL
-jmp FIM
-
-
-parouimpar:
-
-shr bl,1
-jc impar
-jmp par
-
-
-
-par:
-
-
-
-shl cl,1         ;multiplica o divisor por 2
-;add ch,dl        ;adiciona o divisor em ch
-add dh,2         ;adiciona 2 em numero de vezes que o multiplicador cabe dentro do divisor 
-     
-
-sub dl,cl        ;subtrai o divisor duas vezes do diviendo
-shr cl,1 
-xor bl,bl
-add bl,dl
-
-cmp cl,dl
-je iguais
-cmp dl,0
-je iguala0
-cmp dl,0
-jl menorque01
-cmp dl,cl
-jl menorquedivisor
-jmp parouimpar
-
-
-
-impar:
-
-sub bl,1
-
-
-shl cl,1         ;multiplica o divisor por 2
-;add ch,dl        ;adiciona o divisor em ch
-add dh,3         ;adiciona 3 em numero de vezes que o multiplicador cabe dentro do divisor 
-
-
-sub dl,cl 
-shr cl,1        ;subtrai o divisor duas vezes do diviendo
-sub dl,cl
-xor bl,bl
-add bl,dl
-
-cmp cl,dl
-je iguais
-cmp dl,0
-je iguala0
-cmp dl,0
-jl menorque02
-cmp dl,cl
-jl menorquedivisor
-jmp parouimpar
-
-
-iguais:
-sub dl,cl
-add dh,1
-
-jmp resultado2
-
-iguala0:
-jmp resultado2
-
-
-menorquedivisor:
-jmp resultado2
-
-
-
-menorque01:
-add dl,cl
-add dl,cl
-sub dl,cl
-sub dh,1
-jmp resultado2
-
-
-menorque02:
-add dl,cl
-add dl,cl
-add dl,cl
-sub dl,cl
-sub dl,cl
-sub dh,1
-jmp resultado2
-
-
-
-
-
-
-
-resultado2:
-
-mov ch,dh
-
-
-
-mov cl,10
-xor ax,ax
-mov al,ch
-div cl
-
-mov ch,ah
-mov cl,al
-
-mov bl,dl
-
-mov ah,09
-lea dx,msg4
-int 21h
-call PL
-
-
-
-mov dl,cl
-or dl,30h
-mov ah,02
-int 21h
-
-
-
-mov dl,ch
-or dl,30h
-mov ah,02
-int 21h
-
-call PL
-
-
-mov ah,09
-lea dx,msg7
-int 21h
-call PL
-
-mov cl,10
 xor ax,ax
 mov al,bl
-div cl
-
-mov ch,ah
-mov cl,al
-
-
-
-mov dl,cl
-or dl,30h
-mov ah,02
-int 21h
-
-mov dl,ch
-or dl,30h
-mov ah,02
-int 21h
-
-jmp FIM
-
-DIVISAO2:
-
-mov ah,09
-lea dx,msg2
-int 21h
-call PL
-
-
-
-mov ah,01
-int 21h
-and al,0fh
-
-mov bh,al
-
-call PL
-
-mov ah,09
-lea dx,msg3
-int 21h
-call PL
-
-
-mov ah,01
-int 21h
-and al,0fh
-mov dh,al
-
-xor ax,ax
-;xor bh,bh
-mov al,bh
 xor dl,dl
 xor bx,bx
 
@@ -614,23 +284,19 @@ shl bl,1
 or bl,bh
 shr dx,1
 loop divv
+mov ch,al
+jmp divv_resultado
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+divv_maior_que_dividendo:
+mov ah,09
+lea dx,msg6
+int 21h
+jmp FIM
+inderteminacao:
+mov ah,09
+lea dx,msg8
+int 21h
+jmp FIM
 
 
 PL PROC
@@ -644,21 +310,9 @@ PL ENDP
 
 
 
-
-
-
 FIM:
 mov ah,4ch
 int 21h
 
 main ENDP
 end main
-
-
-
-
-
-
-
-
-
