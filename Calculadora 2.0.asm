@@ -10,7 +10,7 @@ TITLE Pedro Rodolfo Silva Galvão Santos (22886287) Murilo Montebello (22018897)
     msg5 DB "-$"
     msg6 DB 'o divisor nao pode ser',10,'maior que o dividendo!$'
     msg7 DB "o resto da divisao e:$"
-    msg8 DB "inderteminacao matematica!$"
+    msg8 DB "operacao impossivel!$"
     msgA DB '+$'
     msgB DB 'x$'
     msgC DB '========================$'
@@ -79,6 +79,8 @@ inicio:
     call Pl     ;<----"chama PL(pular linha)"
     call Pl     ;<----"chama PL(pular linha)"
 
+    and bl,0fh ;<----tranforma caracter em numero
+    and bh,0fh ;<----tranforma caracter em numero
 
 
 ;compara numero selecionado com o numero da operação e pula para operação selecionada
@@ -106,8 +108,6 @@ call DIVISAO
 jmp divv_resultado ;<---- pula para resultado da divisão,que contem resto
 
 resultado:
-and bl,0fh ;<----tranforma caracter em numero
-and bh,0fh ;<----tranforma caracter em numero
 
 xor cx,cx          ;<---- zera cx para fazer a divsão afim de representar numero de 2 digitos
 mov cl,10          ;<---- move divisor 10 para cl 
@@ -219,6 +219,7 @@ jmp FIM      ;<----pula para fim do programa
 
 SOMA PROC
 mov dl,bl
+or dl,30h
 mov ah,02
 int 21h
 
@@ -227,6 +228,7 @@ lea dx,msgA
 int 21h
 
 mov dl,bh
+or dl,30h
 mov ah,02
 int 21h
 
@@ -241,6 +243,7 @@ SOMA endp
 
 SUBTRACAO PROC
 mov dl,bl
+or dl,30h
 mov ah,02
 int 21h
 
@@ -249,6 +252,7 @@ lea dx,msg5
 int 21h
 
 mov dl,bh
+or dl,30h
 mov ah,02
 int 21h
 
@@ -271,7 +275,7 @@ mov ah,09
 lea dx,msg4
 int 21h
 
-call PL         ;<----"chama PL(pular linha)"
+
 
 ;função 09 para exibir sinal '-'antes do numero
 mov ah,09
@@ -282,6 +286,12 @@ or bl,30h       ;<---- tranforma numero em caracter
 mov dl,bl
 mov ah,02
 int 21h
+    call Pl    
+    ;função 09 para exibir mensagem na tela
+    mov ah,09
+    lea dx,msgC
+    int 21h
+  
 
 jmp FIM         ;<----pula para fim do programa
 
@@ -290,6 +300,7 @@ SUBTRACAO ENDP
 
 MULTIPLICACAO PROC
 mov dl,bl
+or dl,30h
 mov ah,02
 int 21h
 
@@ -298,6 +309,7 @@ lea dx,msgB
 int 21h
 
 mov dl,bh
+or dl,30h
 mov ah,02
 int 21h
 
@@ -329,6 +341,7 @@ MULTIPLICACAO ENDP
 DIVISAO:
 
 mov dl,bl
+or dl,30h
 mov ah,02
 int 21h
 
@@ -337,6 +350,7 @@ lea dx,msgG
 int 21h
 
 mov dl,bh
+or dl,30h
 mov ah,02
 int 21h
 call PL
