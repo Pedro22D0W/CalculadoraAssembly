@@ -21,59 +21,69 @@ TITLE Pedro Rodolfo Silva Galvão Santos (22886287)
 
 main PROC
 
-
-mov ax,@data 
-mov ds,ax
-
-
-
-
-mov ah,09
-lea dx,msg1
-int 21h
-call PL
-
-mov ah,01
-int 21h
-MOV ch,al
-call Pl
-
-mov ah,09
-lea dx,msg2
-int 21h
-call PL
+;inicializa DS
+    mov ax,@data 
+    mov ds,ax    
 
 
 
-mov ah,01
-int 21h
-mov bl,al
-and bl,0fh
-call PL
+;função 09 para exibir mensagem na tela
+    mov ah,09    
+    lea dx,msg1
+    int 21h
 
-mov ah,09
-lea dx,msg3
-int 21h
-call PL
+    call PL  ;<----"chama PL(pular linha)"
 
-mov ah,01
-int 21h
-mov bh,al
-and bh,0fh
-call Pl
+;função 01 para o usuario selecionar numero da operaçao 
+    mov ah,01
+    int 21h
+    MOV ch,al;<----move numero da operação selecionada para liberar al
+
+    call Pl  ;<----"chama PL(pular linha)"
+
+;função 09 para exibir mensagem na tela
+    mov ah,09
+    lea dx,msg2
+    int 21h
+
+    call PL  ;<----"chama PL(pular linha)"
 
 
-cmp ch,031h
-JE SOMA0
-cmp ch,032h
-JE SUBTRACAO0
-cmp ch,033h
-je MULTIPLICACAO0
-cmp ch,034h
-je DIVISAO0
+;função 01 para o usuario digitar o primeiro numero 
+    mov ah,01   
+    int 21h
+    mov bl,al
+    and bl,0fh  ;<----tranforma caracter em numero
 
-jmp fim
+    call PL     ;<----"chama PL(pular linha)"
 
+;função 09 para exibir mensagem na tela
+    mov ah,09
+    lea dx,msg3
+    int 21h
+
+
+    call PL     ;<----"chama PL(pular linha)"
+
+;função 01 para o usuario digitar o primeiro numero 
+    mov ah,01
+    int 21h
+    mov bh,al
+    and bh,0fh  ;<----tranforma caracter em numero
+    
+    call Pl     ;<----"chama PL(pular linha)"
+
+;compara numero selecionado com o numero da operação e pula para operação selecionada
+    cmp ch,031h
+    JE SOMA0
+    cmp ch,032h
+    JE SUBTRACAO0
+    cmp ch,033h
+    je MULTIPLICACAO0
+    cmp ch,034h
+    je DIVISAO0
+
+;chama operação selecionada e pula para resultado
 SOMA0:
 call SOMA
 jmp resultado
@@ -84,97 +94,104 @@ MULTIPLICACAO0:
 call MULTIPLICACAO
 jmp resultado
 DIVISAO0:
-jmp DIVISAO
-jmp resultado
+call DIVISAO
+jmp divv_resultado ;<---- pula para resultado da divisão,que contem resto
 
 resultado:
 
-xor cx,cx
-mov cl,10
-xor ax,ax
-mov al,bl
-div cl
+xor cx,cx          ;<---- zera cx para fazer a divsão afim de representar numero de 2 digitos
+mov cl,10          ;<---- move divisor 10 para cl 
+xor ax,ax          ;<---- zera ca para fazer a divsão afim de representar numero de 2 digitos
+mov al,bl          ;<---- move resultado da operaçao realizada para al,(dividendo)
+div cl             ;<---- divide resultado da operação por 10,o Quociente representa a dezena e o resto a unidade
 
-mov bh,al
-mov bl,ah
+mov bh,al          ;<---- move dezena para bh
+mov bl,ah          ;<---- move unidade para bl
 
+;função 09 para exibir mensagem na tela
 mov ah,09
 lea dx,msg4
 int 21h
-call PL
 
+call PL        ;<----"chama PL(pular linha)"
+
+;função 02 para exibir dezena do resultado na tela
 mov dl,bh
 or dl,30h
 mov ah,02
 int 21h
 
-
+;função 02 para exibir unidade do resultado na tela
 mov dl,bl
-or dl,30h
+or dl,30h       ;<----tranforma numero em caracter
 mov ah,02
 int 21h
 
-jmp FIM
+jmp FIM         ;<----pula para fim do programa
 
-divv_resultado:
+divv_resultado: ;<----resultado de divisao,contem resto
 
-mov cl,10
-xor ax,ax
-mov al,bl
-div cl
+mov cl,10       ;<---- move divisor 10 para cl 
+xor ax,ax       ;<---- zera ax para fazer a divsão afim de representar numero de 2 digitos
+mov al,bl       ;<---- move resultado da operaçao realizada para al,(dividendo)
+div cl          ;<---- divide resultado da operação por 10,o Quociente representa a dezena e o resto a unidade
 
-mov bh,ah
-mov bl,al
+mov bh,ah       ;<---- move dezena para bh
+mov bl,al       ;<---- move unidade para bl
 
 
+;função 09 para exibir mensagem na tela
 mov ah,09
 lea dx,msg4
 int 21h
-call PL
+
+call PL         ;<----"chama PL(pular linha)"
 
 
-
+;função 02 para exibir dezena do resultado na tela
 mov dl,bl
 or dl,30h
 mov ah,02
 int 21h
 
 
-
+;função 02 para exibir unidade do resultado na tela
 mov dl,bh
 or dl,30h
 mov ah,02
 int 21h
 
-call PL
+call PL        ;<----"chama PL(pular linha)"
 
-
+;função 09 para exibir mensagem na tela
 mov ah,09
 lea dx,msg7
 int 21h
-call PL
 
-mov cl,10
-xor ax,ax
-mov al,ch
-div cl
+call PL        ;<----"chama PL(pular linha)"
 
-mov bh,ah
-mov bl,al
+mov cl,10      ;<---- move divisor 10 para cl 
+xor ax,ax      ;<---- zera ax para fazer a divsão afim de representar numero de 2 digitos
+mov al,ch      ;<---- move resto da operaçao realizada para al,(dividendo)
+div cl         ;<---- divide resto da operação por 10,o Quociente representa a dezena e o resto a unidade
+
+mov bh,ah       ;<---- move dezena para bh
+mov bl,al       ;<---- move unidade para bl
 
 
-
+;função 02 para exibir dezena do resto na tela
 mov dl,bl
 or dl,30h
 mov ah,02
 int 21h
 
+;função 02 para exibir unidade do resto na tela
 mov dl,bh
 or dl,30h
 mov ah,02
 int 21h
 
-jmp FIM
+jmp FIM      ;<----pula para fim do programa
 
 
 
@@ -182,8 +199,8 @@ jmp FIM
 
 SOMA PROC
 
-add bl,bh
-RET
+add bl,bh       ;soma primeiro numero digitado com o segundo
+RET             ;retorna para onde o call foi solicitado
 
 SOMA endp
 
@@ -191,115 +208,117 @@ SOMA endp
 
 SUBTRACAO PROC
 
-mov ax,@data 
-mov ds,ax
 
+cmp bl,bh       ;compara o primero numero com o segundo
+jl NEGATIVO     ;se o primeiro for menor pula para representação de numero negativo
 
+sub bl,bh       ;subtrai do primeiro numero o segundo numero
+RET             ;retorna para onde o call foi solicitado
 
-cmp bl,bh
-jl NEGATIVO
+NEGATIVO:       ;<---- representação de numero negativo
 
-sub bl,bh
-RET
+xchg bl,bh      ;inverte posição dos numeros
+sub bl,bh       ;subtrai o segundo numero digitado com o primeiro
 
-NEGATIVO:
-
-xchg bl,bh
-sub bl,bh
-
+;função 09 para exibir mensagem na tela
 mov ah,09
 lea dx,msg4
 int 21h
-call PL
 
+call PL         ;<----"chama PL(pular linha)"
+
+;função 09 para exibir sinal '-'antes do numero
 mov ah,09
 lea dx,msg5
 int 21h
 
-or bl,30h
+or bl,30h       ;<---- tranforma numero em caracter
 mov dl,bl
 mov ah,02
 int 21h
-jmp FIM
+
+jmp FIM         ;<----pula para fim do programa
 
 SUBTRACAO ENDP
 
 
 MULTIPLICACAO PROC
-xor dx,dx
-xor cx,cx
-mov cl,5
+xor dx,dx       ;<---- zera dx para armazenar o resultado
+xor cx,cx       ;<---- zera cx para iniciar contador
+mov cl,5        ;<---- adiciona 5 ao contador(numero de bits para representar numeros de 1 digito)
 
-mult1:
+mult1:  ;<---- multiplicação baseada ma multiplicação no papel 
 
-shr bl,1
-jc addd
-shl bh,1
-loop mult1
-mov bl,dh
-RET
+shr bl,1        ;<---- desloca primeiro numero uma casa para esquerda afim de checar o bit menos significativo
+jc addd         ;<---- checa carry que contem o bit menos significativo,se igual a 1 pula para addd
+shl bh,1        ;<---- se o menos significativo(no carry) for 0,desloca segundo numero 1 casa para esquerda
+loop mult1      ;<---- refaz procediemento até cx ser igual a zero
+mov bl,dh       ;<---- move resultado para bl
+RET             ;<---- retorna para onde o call foi solicitado
 
 addd:
-add dh,bh
-shl bh,1
-loop mult1
-mov bl,dh
-RET
+add dh,bh       ;<---- adiciona no resultado segundo numero
+shl bh,1        ;<---- desloca segundo numero 1 casa para esquerda
+loop mult1      ;<---- refaz procediemento até cx ser igual a zero
+mov bl,dh       ;<---- move resultado para bl
+RET             ;<---- retorna para onde o carry foi solicitado
+
 MULTIPLICACAO ENDP
 
 
 DIVISAO:
 
-cmp bh,bl
-jg divv_maior_que_dividendo
-cmp bh,0
-je inderteminacao
+cmp bh,bl                       ;<---- compara divisor com o dividendo 
+jg divv_maior_que_dividendo     ;<---- se o divisor for maior que o dividendo pula para exibir mensagem de impossibilidade
+cmp bh,0                        ;<---- compara divisor com 0 
+je inderteminacao               ;<---- se o divisor 0 pula para exibir mensagem de inderteminação
 
 
 
 
-mov dh,bh
+mov dh,bh       ;<---- move o divisor para dh
 
-xor ax,ax
-mov al,bl
-xor dl,dl
-xor bx,bx
+xor ax,ax       ;<---- zera ax para armazenar o dividendo
+mov al,bl       ;<---- move o dividendo para al
+xor dl,dl       ;<---- zera dl para poder manipular o divisor 
+xor bx,bx       ;<---- zera bx para armazenar o resultado
 
 
 
-mov cx,9
+mov cx,9       ;<----- adiciona 9 no contador para trabalhar com 9 bits
 
 divv:
-sub ax,dx
-jns subb1
-add ax,dx
-mov bh,0
-jmp subb2
+sub ax,dx      ;<----- subtrai divisor do dividendo
+jns subb1      ;<----- se o resultado da divisão não for negativo não reverte o processo
+add ax,dx      ;<----- reverte o processo 
+mov bh,0       ;<----- adiciona 0 nos bits do resultado
+jmp subb2      ;<----- pula para 
 
 subb1:
-mov bh,1
+mov bh,1       ;<----- adiciona 1 nos bits do resultado
 
 subb2:
-shl bl,1
-or bl,bh
-shr dx,1
-loop divv
-mov ch,al
-jmp divv_resultado
+shl bl,1       ;<----- desloca resultado 1 casa para esquerda
+or bl,bh       ;<----- adicina bit (0 ou 1) na casa certa
+shr dx,1       ;<----- desloca divisor uma casa para direita
+loop divv      ;<----- refaz procediemento até cx ser igual a zero
+mov ch,al      ;<----- move o resto para ch
+RET            ;<----- retorna para onde o call foi solicitado
 
-divv_maior_que_dividendo:
+
+divv_maior_que_dividendo:  ;<---- exibe mensagem de divisor maior que o dividendo na tela
 mov ah,09
 lea dx,msg6
 int 21h
 jmp FIM
-inderteminacao:
+inderteminacao:            ;<---- exibe mensagem de inderteminação matematica na tela
 mov ah,09
 lea dx,msg8
 int 21h
 jmp FIM
 
 
-PL PROC
+PL PROC   ;<---- pula linha
     
     mov ah,02
     mov dl,10
@@ -310,7 +329,7 @@ PL ENDP
 
 
 
-FIM:
+FIM:   ;<---- fim do codigo
 mov ah,4ch
 int 21h
 
