@@ -11,7 +11,6 @@ TITLE Pedro Rodolfo Silva Galvão Santos (22886287) Murilo Montebello (22018897)
     msg6 DB 'o divisor nao pode ser',10,'maior que o dividendo!$'
     msg7 DB "o resto da divisao e:$"
     msg8 DB "inderteminacao matematica!$"
-    msg9 DB '------------------------|$'
     msgA DB '+$'
     msgB DB 'x$'
     msgC DB '========================$'
