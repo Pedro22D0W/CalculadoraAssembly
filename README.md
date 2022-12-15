@@ -1,4 +1,4 @@
 # CalculadoraAssembly
  
-##Organização de Sistemas de Computação
-###calculadora feita em assembly 
+## Organização de Sistemas de Computação
+### calculadora feita em assembly 
